@@ -1,6 +1,6 @@
-This is a template to make it easy to get started with live code reloading using BearLibTerminal.
+This is a template to make it easy to get started with BearLibTerminal.
 
-Currently the live reloading is only tested/working on Linux, but the resulting program can be compiled in release mode for Linux and Windows. MacOS currently is untested.
+This Linux and Windows. MacOS currently is untested.
 
 ## Installing required lib on Linux
 
@@ -14,14 +14,18 @@ Alternately if your OS has a package for BearLibTerminal, that may work as well.
 
 Once that's done compiling in debug mode with `cargo build` and release mode with `cargo build --release` should work.
 
-## Compiling release mode for Windows
+## Compiling for Windows
 
-You will need a copy of the precompiled `BearLibTerminal.dll` and `BearLibTerminal.lib`.
+Install [Rust](https://rustup.rs/) if you haven't already.
 
-Perform the folloing steps:
+You will also need a copy of the precompiled `BearLibTerminal.dll` and `BearLibTerminal.lib`. This version is currently tested against 0.15.7 [found here](http://foo.wyrd.name/en:bearlibterminal#download).
 
-copy BearLibTerminal.lib to the project root
+Copy BearLibTerminal.lib to the project root. Then building using `cargo` should work as expected.
 
-Comment out the line containing `crate-type = ["dylib"]` in the `Cargo.toml` in the `state_manipulation` folder. (this is more or less a workaround for [this issue](https://github.com/rust-lang/rust/issues/18807), hopefully we will eventually be able to make this switch using the `cfg` attribute, but currently using the attribute doesn't appear to work correctly.)
+### Windows release
 
 Run `cargo build --release` then copy the exe in `./target/release` to the desired location as well as `BearLibTerminal.dll` and any necessary assets (graphics, sound, etc.).
+
+### History
+
+This was based on [another template](https://github.com/Ryan1729/live-code-bear-lib-terminal-template) which had a nice feature that was hard to get working cross-platform and which made deploying on windows a pain. This version attempts to increase compatibility by removing the feature.

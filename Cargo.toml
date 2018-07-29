@@ -1,5 +1,5 @@
 [package]
-name = "live-code-template"
+name = "bear-lib-terminal-template"
 version = "0.1.0"
 authors = ["Ryan1729 <Ryan1729@gmail.com>"]
 
