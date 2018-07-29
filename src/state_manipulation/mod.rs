@@ -1,9 +1,10 @@
-extern crate rand;
 extern crate common;
 
 use common::*;
 
-use rand::{StdRng, SeedableRng, Rng};
+use rand::{Rng, SeedableRng, StdRng};
+
+use std::time;
 
 //NOTE(Ryan1729): debug_assertions only appears to work correctly when the
 //crate is not a dylib. Assuming you make this crate *not* a dylib on release,
@@ -23,8 +24,8 @@ pub fn new_state(size: Size) -> State {
 #[no_mangle]
 pub fn new_state(size: Size) -> State {
     //show the title screen
-    let timestamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
+    let timestamp = time::SystemTime::now()
+        .duration_since(time::UNIX_EPOCH)
         .map(|dur| dur.as_secs())
         .unwrap_or(42);
 
@@ -34,7 +35,6 @@ pub fn new_state(size: Size) -> State {
 
     make_state(rng)
 }
-
 
 fn make_state(mut rng: StdRng) -> State {
     rng.gen::<bool>();
@@ -69,8 +69,8 @@ pub fn update_and_render(platform: &Platform, state: &mut State, events: &mut Ve
             } => {
                 left_mouse_released = true;
             }
-            Event::Close |
-            Event::KeyPressed {
+            Event::Close
+            | Event::KeyPressed {
                 key: KeyCode::Escape,
                 ctrl: _,
                 shift: _,
@@ -90,11 +90,13 @@ pub fn update_and_render(platform: &Platform, state: &mut State, events: &mut Ve
         id: 1,
     };
 
-    if do_button(platform,
-                 &mut state.ui_context,
-                 &button_spec,
-                 left_mouse_pressed,
-                 left_mouse_released) {
+    if do_button(
+        platform,
+        &mut state.ui_context,
+        &button_spec,
+        left_mouse_pressed,
+        left_mouse_released,
+    ) {
         println!("Button pushed!");
     }
 
@@ -135,12 +137,13 @@ pub struct ButtonSpec {
 //calling this once will swallow multiple clicks on the button. We could either
 //pass in and return the number of clicks to fix that, or this could simply be
 //called multiple times per frame (once for each click).
-fn do_button(platform: &Platform,
-             context: &mut UIContext,
-             spec: &ButtonSpec,
-             left_mouse_pressed: bool,
-             left_mouse_released: bool)
-             -> bool {
+fn do_button(
+    platform: &Platform,
+    context: &mut UIContext,
+    spec: &ButtonSpec,
+    left_mouse_pressed: bool,
+    left_mouse_released: bool,
+) -> bool {
     let mut result = false;
 
     let mouse_pos = (platform.mouse_position)();
@@ -164,19 +167,23 @@ fn do_button(platform: &Platform,
     }
 
     if context.active == id && (platform.key_pressed)(KeyCode::MouseLeft) {
-        draw_rect_with(platform,
-                       spec.x,
-                       spec.y,
-                       spec.w,
-                       spec.h,
-                       ["╔", "═", "╕", "║", "│", "╙", "─", "┘"]);
+        draw_rect_with(
+            platform,
+            spec.x,
+            spec.y,
+            spec.w,
+            spec.h,
+            ["╔", "═", "╕", "║", "│", "╙", "─", "┘"],
+        );
     } else if context.hot == id {
-        draw_rect_with(platform,
-                       spec.x,
-                       spec.y,
-                       spec.w,
-                       spec.h,
-                       ["┌", "─", "╖", "│", "║", "╘", "═", "╝"]);
+        draw_rect_with(
+            platform,
+            spec.x,
+            spec.y,
+            spec.w,
+            spec.h,
+            ["┌", "─", "╖", "│", "║", "╘", "═", "╝"],
+        );
     } else {
         draw_rect(platform, spec.x, spec.y, spec.w, spec.h);
     }
@@ -202,16 +209,16 @@ fn print_centered_line(platform: &Platform, x: i32, y: i32, w: i32, h: i32, text
     (platform.print_xy)(x_, y_, &text);
 }
 
-
 fn draw_rect(platform: &Platform, x: i32, y: i32, w: i32, h: i32) {
-    draw_rect_with(platform,
-                   x,
-                   y,
-                   w,
-                   h,
-                   ["┌", "─", "┐", "│", "│", "└", "─", "┘"]);
+    draw_rect_with(
+        platform,
+        x,
+        y,
+        w,
+        h,
+        ["┌", "─", "┐", "│", "│", "└", "─", "┘"],
+    );
 }
-
 
 fn draw_rect_with(platform: &Platform, x: i32, y: i32, w: i32, h: i32, edges: [&str; 8]) {
     (platform.clear)(Some(Rect::from_values(x, y, w, h)));

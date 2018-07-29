@@ -1,18 +1,18 @@
-
 extern crate bear_lib_terminal;
 extern crate common;
+extern crate rand;
 
 #[cfg(debug_assertions)]
 extern crate libloading;
-#[cfg(not(debug_assertions))]
-extern crate state_manipulation;
 
 #[cfg(debug_assertions)]
 use libloading::Library;
 
-use bear_lib_terminal::terminal::{self, config, Event, KeyCode, state};
-use bear_lib_terminal::Color;
+mod state_manipulation;
+
 use bear_lib_terminal::geometry::{Point, Rect, Size};
+use bear_lib_terminal::terminal::{self, config, state, Event, KeyCode};
+use bear_lib_terminal::Color;
 
 use std::mem;
 
@@ -40,19 +40,24 @@ impl Application {
 
     fn new_state(&self, size: common::Size) -> State {
         unsafe {
-            let f = self.library.get::<fn(common::Size) -> State>(b"new_state\0").unwrap();
+            let f = self
+                .library
+                .get::<fn(common::Size) -> State>(b"new_state\0")
+                .unwrap();
 
             f(size)
         }
     }
 
-    fn update_and_render(&self,
-                         platform: &Platform,
-                         state: &mut State,
-                         events: &Vec<Event>)
-                         -> bool {
+    fn update_and_render(
+        &self,
+        platform: &Platform,
+        state: &mut State,
+        events: &Vec<Event>,
+    ) -> bool {
         unsafe {
-            let f = self.library
+            let f = self
+                .library
                 .get::<fn(&Platform, &mut State, &Vec<Event>) -> bool>(b"update_and_render\0")
                 .unwrap();
             f(platform, state, events)
@@ -69,13 +74,18 @@ impl Application {
         state_manipulation::new_state(size)
     }
 
-    fn update_and_render(&self,
-                         platform: &Platform,
-                         state: &mut State,
-                         events: &Vec<Event>)
-                         -> bool {
-        let mut new_events: Vec<common::Event> =
-            unsafe { events.iter().map(|a| mem::transmute::<Event, common::Event>(*a)).collect() };
+    fn update_and_render(
+        &self,
+        platform: &Platform,
+        state: &mut State,
+        events: &Vec<Event>,
+    ) -> bool {
+        let mut new_events: Vec<common::Event> = unsafe {
+            events
+                .iter()
+                .map(|a| mem::transmute::<Event, common::Event>(*a))
+                .collect()
+        };
         state_manipulation::update_and_render(platform, state, &mut new_events)
     }
 }
@@ -83,16 +93,16 @@ impl Application {
 fn main() {
     terminal::open("____", 80, 30);
     terminal::set(config::Window::empty().resizeable(true));
-    terminal::set(vec![config::InputFilter::Group {
-                           group: config::InputFilterGroup::Keyboard,
-                           both: false,
-                       },
-                       config::InputFilter::Group {
-                           group: config::InputFilterGroup::Mouse,
-                           both: false,
-                       }]);
-
-
+    terminal::set(vec![
+        config::InputFilter::Group {
+            group: config::InputFilterGroup::Keyboard,
+            both: false,
+        },
+        config::InputFilter::Group {
+            group: config::InputFilterGroup::Mouse,
+            both: false,
+        },
+    ]);
 
     let mut app = Application::new();
 
@@ -104,7 +114,6 @@ fn main() {
         //hopefully this is actually compiled out
         std::time::SystemTime::now()
     };
-
 
     let platform = Platform {
         print_xy: terminal::print_xy,
@@ -129,12 +138,11 @@ fn main() {
     //reads the foreground then sets a different one then sets
     // it back to what it was before.
     set_foreground(common::Color {
-                       red: 255,
-                       green: 255,
-                       blue: 255,
-                       alpha: 255,
-                   });
-
+        red: 255,
+        green: 255,
+        blue: 255,
+        alpha: 255,
+    });
 
     let mut events = Vec::new();
 
@@ -167,7 +175,6 @@ fn main() {
                 }
             }
         }
-
     }
 
     terminal::close();
@@ -188,8 +195,10 @@ fn mouse_position() -> common::Point {
 //Note: index selects a cell in *a single* layer, in case you have composition mode on.
 //To pick on different layers, set the current layer then pick.
 fn pick(point: common::Point, index: i32) -> char {
-    terminal::pick(unsafe { mem::transmute::<common::Point, Point>(point) },
-                   index)
+    terminal::pick(
+        unsafe { mem::transmute::<common::Point, Point>(point) },
+        index,
+    )
 }
 
 fn key_pressed(key: common::KeyCode) -> bool {
@@ -197,9 +206,10 @@ fn key_pressed(key: common::KeyCode) -> bool {
 }
 
 fn set_colors(fg: common::Color, bg: common::Color) {
-    terminal::set_colors(unsafe { mem::transmute::<common::Color, Color>(fg) },
-                         unsafe { mem::transmute::<common::Color, Color>(bg) });
-
+    terminal::set_colors(
+        unsafe { mem::transmute::<common::Color, Color>(fg) },
+        unsafe { mem::transmute::<common::Color, Color>(bg) },
+    );
 }
 
 fn get_colors() -> (common::Color, common::Color) {
