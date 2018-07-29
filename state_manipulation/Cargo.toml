@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Ryan1729 <Ryan1729@gmail.com>"]
 
 [lib]
-crate-type = ["dylib"]
 
 [dependencies]
 rand = "0.3"
