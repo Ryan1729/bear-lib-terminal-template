@@ -7,7 +7,7 @@ use rand::{Rng, SeedableRng, StdRng};
 //these configs should work
 #[cfg(debug_assertions)]
 pub fn new_state(size: Size) -> State {
-    println!("debug on");
+    println!("debug on. {:?}", size);
 
     let seed: &[_] = &[42];
     let rng: StdRng = SeedableRng::from_seed(seed);

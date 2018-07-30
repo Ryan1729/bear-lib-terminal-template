@@ -64,24 +64,14 @@ impl UIContext {
     }
 }
 
-pub enum Direction {
-    Right,
-    Left,
-}
-
-
-
-
-
-
-
-
-
-//NOTE(Ryan1729): if I import BearLibTerminal.rs into `state_manipulation` or a crate
-//`state_manipulation` depends on, like this one for example, then the
-//ffi to the C version of BearLibTerminal causes an error. I just want
-//the geometry datatypes and the Event and Keycode definitions so I have
-//copied them from BearLibTerminal.rs below
+//
+//
+//
+//NOTE(Ryan1729): These weres here due to an FFI error in the live-reloading version of
+//my bear-lib-terminal-template.However, it's nice to have a layer separating the
+//application specific code from the platform, so I've kept these here. I just want the
+//geometry datatypes and the Event and Keycode definitions so I have copied them from
+// BearLibTerminal.rs below
 
 //BearLibTerminal.rs is released under the MIT license by nabijaczleweli.
 //see https://github.com/nabijaczleweli/BearLibTerminal.rs/blob/master/LICENSE
@@ -117,7 +107,6 @@ impl Point {
         Point { x: x, y: y }
     }
 }
-
 
 /// A 2D size representation.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -224,7 +213,6 @@ impl Rect {
         Rect::from_size(origin, size)
     }
 
-
     /// Construct a `Rect` from its top-left and bottom-right corners, values unwrapped.
     ///
     /// # Examples
@@ -234,11 +222,12 @@ impl Rect {
     /// assert_eq!(Rect::from_point_values(10, 20, 30, 40),
     ///     Rect::from_points(Point::new(10, 20), Point::new(30, 40)));
     /// ```
-    pub fn from_point_values(top_left_x: i32,
-                             top_left_y: i32,
-                             bottom_right_x: i32,
-                             bottom_right_y: i32)
-                             -> Rect {
+    pub fn from_point_values(
+        top_left_x: i32,
+        top_left_y: i32,
+        bottom_right_x: i32,
+        bottom_right_y: i32,
+    ) -> Rect {
         let top_left = Point::new(top_left_x, top_left_y);
         let bottom_right = Point::new(bottom_right_x, bottom_right_y);
         Rect::from_points(top_left, bottom_right)
@@ -393,6 +382,7 @@ pub enum KeyCode {
 }
 
 /// A single input event.
+#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Event {
     /// Terminal window closed.
