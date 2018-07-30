@@ -27,7 +27,8 @@ pub fn update_and_render(platform: &Platform, state: &mut State, events: &Vec<Ev
 }
 
 fn main() {
-    terminal::open("____", 80, 30);
+    let title = option_env!("CARGO_PKG_NAME").unwrap_or("____");
+    terminal::open(title, 80, 30);
     terminal::set(config::Window::empty().resizeable(true));
     terminal::set(vec![
         config::InputFilter::Group {
