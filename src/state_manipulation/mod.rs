@@ -1,5 +1,3 @@
-extern crate common;
-
 use common::*;
 
 use rand::{Rng, SeedableRng, StdRng};

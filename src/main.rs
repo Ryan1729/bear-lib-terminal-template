@@ -1,5 +1,4 @@
 extern crate bear_lib_terminal;
-extern crate common;
 extern crate rand;
 
 #[cfg(debug_assertions)]
@@ -8,6 +7,7 @@ extern crate libloading;
 #[cfg(debug_assertions)]
 use libloading::Library;
 
+mod common;
 mod state_manipulation;
 
 use bear_lib_terminal::geometry::{Point, Rect, Size};
