@@ -1,6 +1,6 @@
 This is a template to make it easy to get started with BearLibTerminal.
 
-This Linux and Windows. MacOS currently is untested.
+This has been tested on Linux and Windows. MacOS currently is untested.
 
 ## Installing required lib on Linux
 
