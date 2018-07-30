@@ -2,15 +2,11 @@ use common::*;
 
 use rand::{Rng, SeedableRng, StdRng};
 
-use std::time;
-
 //NOTE(Ryan1729): debug_assertions only appears to work correctly when the
 //crate is not a dylib. Assuming you make this crate *not* a dylib on release,
 //these configs should work
 #[cfg(debug_assertions)]
-#[no_mangle]
 pub fn new_state(size: Size) -> State {
-    //skip the title screen
     println!("debug on");
 
     let seed: &[_] = &[42];
@@ -18,10 +14,10 @@ pub fn new_state(size: Size) -> State {
 
     make_state(rng)
 }
+
 #[cfg(not(debug_assertions))]
-#[no_mangle]
 pub fn new_state(size: Size) -> State {
-    //show the title screen
+    use std::time;
     let timestamp = time::SystemTime::now()
         .duration_since(time::UNIX_EPOCH)
         .map(|dur| dur.as_secs())
@@ -43,7 +39,6 @@ fn make_state(mut rng: StdRng) -> State {
     }
 }
 
-#[no_mangle]
 //returns true if quit requested
 pub fn update_and_render(platform: &Platform, state: &mut State, events: &mut Vec<Event>) -> bool {
     let mut left_mouse_pressed = false;

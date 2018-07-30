@@ -1,12 +1,6 @@
 extern crate bear_lib_terminal;
 extern crate rand;
 
-#[cfg(debug_assertions)]
-extern crate libloading;
-
-#[cfg(debug_assertions)]
-use libloading::Library;
-
 mod common;
 mod state_manipulation;
 
@@ -18,76 +12,18 @@ use std::mem;
 
 use common::*;
 
-#[cfg(debug_assertions)]
-const LIB_PATH: &'static str = "./target/debug/libstate_manipulation.so";
-#[cfg(not(debug_assertions))]
-const LIB_PATH: &'static str = "Hopefully compiled out";
-
-#[cfg(debug_assertions)]
-struct Application {
-    library: Library,
+pub fn new_state(size: common::Size) -> State {
+    state_manipulation::new_state(size)
 }
-#[cfg(not(debug_assertions))]
-struct Application {}
 
-#[cfg(debug_assertions)]
-impl Application {
-    fn new() -> Self {
-        let library = Library::new(LIB_PATH).unwrap_or_else(|error| panic!("{}", error));
-
-        Application { library: library }
-    }
-
-    fn new_state(&self, size: common::Size) -> State {
-        unsafe {
-            let f = self
-                .library
-                .get::<fn(common::Size) -> State>(b"new_state\0")
-                .unwrap();
-
-            f(size)
-        }
-    }
-
-    fn update_and_render(
-        &self,
-        platform: &Platform,
-        state: &mut State,
-        events: &Vec<Event>,
-    ) -> bool {
-        unsafe {
-            let f = self
-                .library
-                .get::<fn(&Platform, &mut State, &Vec<Event>) -> bool>(b"update_and_render\0")
-                .unwrap();
-            f(platform, state, events)
-        }
-    }
-}
-#[cfg(not(debug_assertions))]
-impl Application {
-    fn new() -> Self {
-        Application {}
-    }
-
-    fn new_state(&self, size: common::Size) -> State {
-        state_manipulation::new_state(size)
-    }
-
-    fn update_and_render(
-        &self,
-        platform: &Platform,
-        state: &mut State,
-        events: &Vec<Event>,
-    ) -> bool {
-        let mut new_events: Vec<common::Event> = unsafe {
-            events
-                .iter()
-                .map(|a| mem::transmute::<Event, common::Event>(*a))
-                .collect()
-        };
-        state_manipulation::update_and_render(platform, state, &mut new_events)
-    }
+pub fn update_and_render(platform: &Platform, state: &mut State, events: &Vec<Event>) -> bool {
+    let mut new_events: Vec<common::Event> = unsafe {
+        events
+            .iter()
+            .map(|a| mem::transmute::<Event, common::Event>(*a))
+            .collect()
+    };
+    state_manipulation::update_and_render(platform, state, &mut new_events)
 }
 
 fn main() {
@@ -104,16 +40,7 @@ fn main() {
         },
     ]);
 
-    let mut app = Application::new();
-
-    let mut state = app.new_state(size());
-
-    let mut last_modified = if cfg!(debug_assertions) {
-        std::fs::metadata(LIB_PATH).unwrap().modified().unwrap()
-    } else {
-        //hopefully this is actually compiled out
-        std::time::SystemTime::now()
-    };
+    let mut state = new_state(size());
 
     let platform = Platform {
         print_xy: terminal::print_xy,
@@ -146,7 +73,7 @@ fn main() {
 
     let mut events = Vec::new();
 
-    app.update_and_render(&platform, &mut state, &mut events);
+    update_and_render(&platform, &mut state, &mut events);
 
     terminal::refresh();
 
@@ -159,22 +86,12 @@ fn main() {
 
         terminal::clear(None);
 
-        if app.update_and_render(&platform, &mut state, &mut events) {
+        if update_and_render(&platform, &mut state, &mut events) {
             //quit requested
             break;
         }
 
         terminal::refresh();
-
-        if cfg!(debug_assertions) {
-            if let Ok(Ok(modified)) = std::fs::metadata(LIB_PATH).map(|m| m.modified()) {
-                if modified > last_modified {
-                    drop(app);
-                    app = Application::new();
-                    last_modified = modified;
-                }
-            }
-        }
     }
 
     terminal::close();

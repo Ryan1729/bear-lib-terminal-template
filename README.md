@@ -20,7 +20,11 @@ Install [Rust](https://rustup.rs/) if you haven't already.
 
 You will also need a copy of the precompiled `BearLibTerminal.dll` and `BearLibTerminal.lib`. This version is currently tested against 0.15.7 [found here](http://foo.wyrd.name/en:bearlibterminal#download).
 
-Copy BearLibTerminal.lib to the project root. Then building using `cargo` should work as expected.
+`BearLibTerminal.dll` is required to run the program and must be distributed along with the binary.
+
+`BearLibTerminal.lib` is required to build the program.
+
+Copy both `BearLibTerminal.lib` and `BearLibTerminal.dll` to the project root, then building using `cargo` should work as expected.
 
 ### Windows release
 
